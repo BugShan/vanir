@@ -40,14 +40,14 @@ namespace vanir
 		return nullptr;
 	}
 
-	const std::vector<const Class* const> Class::GetAllBaseTypeVec(void) const
+	const std::vector<const Class*> Class::GetAllBaseTypeVec(void) const
 	{
-		std::vector<const Class* const> ret;
+		std::vector<const Class*> ret;
 		for(auto& name : mBaseTypeNameVec)
 		{
 			const Type* const type = vanir::GetTypeByName(name);
 			if(type)
-				ret.push_back(static_cast<const Class* const>(type));
+				ret.push_back(static_cast<const Class*>(type));
 		}
 		return ret;
 	}

@@ -23,19 +23,19 @@ namespace vanir
 		 * Get the Field of this Type.
 		 * @return: the vector of the Field pointer
 		 */
-		inline const std::vector<const Field*  const>& GetFieldPtrVec(void)  const;
+		inline const std::vector<const Field*>& GetFieldPtrVec(void)  const;
 		/**
 		 * Get the Methods of this Type.
 		 * @return: the vector of the Method pointer
 		 */
-		inline const std::vector<const Method* const>& GetMethodPtrVec(void) const;
+		inline const std::vector<const Method*>& GetMethodPtrVec(void) const;
 
 	public:
 		/**
 		 * Get all base type registered in vanir runtime.
 		 * !There is some case as some type not registered int runtime.
 		 */
-		const std::vector<const Class* const> GetAllBaseTypeVec(void) const;
+		const std::vector<const Class*> GetAllBaseTypeVec(void) const;
 		/**
 		 * Get a Field defined in this class by name.
 		 * @param fieldName: the name of the Field to found
@@ -54,7 +54,7 @@ namespace vanir
 		 * Set all the base type of this class
 		 * @baseTypeName: the r-value of this name vector
 		 */
-		inline void SetBaseTypeNameVec(const std::vector<std::string>&& baseTypeNameVec);
+		inline void SetBaseTypeNameVec(std::vector<std::string>&& baseTypeNameVec);
 		/**
 		 * Add a Field defined in this class.
 		 * @param fieldPtr: the pointer of this field
@@ -68,18 +68,18 @@ namespace vanir
 
 	private:
 		std::vector<std::string>			mBaseTypeNameVec;
-		std::vector<const Method* const>	mMethodPtrVec;
-		std::vector<const Field*  const>	mFieldPtrVec;
+		std::vector<const Method*>			mMethodPtrVec;
+		std::vector<const Field*>			mFieldPtrVec;
 	};//class Class
 
 	inline const std::vector<std::string>& Class::GetAllBaseTypeNameVec(void) const
 	{ return this->mBaseTypeNameVec; }
-	inline const std::vector<const Field* const>& Class::GetFieldPtrVec(void) const
+	inline const std::vector<const Field*>& Class::GetFieldPtrVec(void) const
 	{ return this->mFieldPtrVec; }
-	inline const std::vector<const Method* const>& Class::GetMethodPtrVec(void) const
+	inline const std::vector<const Method*>& Class::GetMethodPtrVec(void) const
 	{ return this->mMethodPtrVec; }
 
-	inline void Class::SetBaseTypeNameVec(const std::vector<std::string>&& baseTypeNameVec)
+	inline void Class::SetBaseTypeNameVec(std::vector<std::string>&& baseTypeNameVec)
 	{
 		mBaseTypeNameVec.swap(baseTypeNameVec);
 	}

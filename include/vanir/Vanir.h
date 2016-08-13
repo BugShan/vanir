@@ -3,6 +3,8 @@
 
 #include <vanir/Common.h>
 #include <vanir/Type.h>
+#include <vanir/Class.h>
+#include <vanir/Enum.h>
 #include <string>
 #include <vector>
 

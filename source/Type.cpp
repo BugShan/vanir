@@ -4,15 +4,21 @@ namespace vanir
 {
 	type_id Type::suNextID = Type::INVALID_ID + 1;
 
+	std::string SubStrName(const std::string& fullName)
+	{
+		const auto pos = fullName.find_last_not_of("::");
+		if(pos == std::string::npos)
+			return fullName;
+		else
+			return fullName.substr(pos, fullName.size() - pos);
+	}
+
 	Type::Type(const std::string& fullName, const unsigned int typeKind)
 		: muID(suNextID++)
-		, mName()
+		, mName(SubStrName(fullName))
 		, mFullName(fullName)
 		, muTypeKind(typeKind)
-	{
-		auto pos = mName.find_last_of("::");
-		mName = mFullName.substr(pos, mFullName.size() - pos);
-	}
+	{ ; }
 
 	Type::~Type(void)
 	{ ; }
