@@ -4,6 +4,7 @@ set(LLVM_SEARCH_PATHS	/usr/local/include/llvm
 						/usr/local/opt/llvm
 						${LLVM_ROOT}
 						$ENV{LLVM_ROOT}
+						${VANIR_ROOT_DIR}/the3rd/llvm
 						)
 
 #find include directory

@@ -1,0 +1,11 @@
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(VANIR_TOOL_BIN_DIR ${VANIR_ROOT_DIR}/bin/mac)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+	set(VANIR_TOOL_BIN_DIR ${VANIR_ROOT_DIR}/bin/linux)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+	set(VANIR_TOOL_BIN_DIR ${VANIR_ROOT_DIR}/bin/window)
+else()
+	message(SEND_ERROR	"Unkown platform!"
+						"[Vanir] only supports @Mac, @Linux, @Window platforms now")
+endif()
+set(VANIR_TOOL_EXE ${VANIR_TOOL_BIN_DIR}/vanir)

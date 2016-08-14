@@ -2,10 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(vanir_tool CXX)
 set(VANIR_TOOL_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(VANIR_TOOL_BUILD_DIR ${CMAKE_BINARY_DIR})
 
-add_subdirectory(${VANIR_TOOL_ROOT_DIR}/.. libvanir)
-set(CMAKE_MODULE_PATH "${VANIR_TOOL_ROOT_DIR}/../cmake")
+set(CMAKE_MODULE_PATH "${VANIR_ROOT_DIR}/cmake")
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
@@ -16,7 +14,7 @@ set(Boost_ALL_NO_LIB ON)
 add_definitions(-DBOOST_ALL_NO_LIB)
 find_package(Boost REQUIRED
 	COMPONENTS program_options)
-include_directories(${Boost_INCLUDE_DIRES})
+include_directories(${Boost_INCLUDE_DIRS})
 
 find_package(LLVM REQUIRED)
 include_directories(${LLVM_INCLUDE_DIR})
@@ -44,3 +42,12 @@ endforeach()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 add_executable(vanir ${VANIR_TOOL_INCLUDE_GROUP} ${VANIR_TOOL_SOURCES_GROUP})
 target_link_libraries(vanir ${Boost_LIBRARIES} ${LIBCLANG})
+
+#copy vanir to bin
+include(VanirTool)
+add_custom_command(
+	TARGET	vanir
+	POST_BUILD
+	COMMAND	echo "copy vanir to ${VANIR_TOOL_BIN_DIR}"
+	COMMAND	cp ${CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CMAKE_BUILD_TYPE_UPPER}}/vanir ${VANIR_TOOL_EXE}
+	)
