@@ -59,7 +59,7 @@ namespace vanir
 		 * Add a Field defined in this class.
 		 * @param fieldPtr: the pointer of this field
 		 */
-		inline void DefienField(const Field* const fieldPtr);
+		inline void DefineField(const Field* const fieldPtr);
 		/**
 		 * Add a Method defiend in this class.
 		 * @param methodPtr: the pointer of the method
@@ -83,7 +83,7 @@ namespace vanir
 	{
 		mBaseTypeNameVec.swap(baseTypeNameVec);
 	}
-	inline void Class::DefienField(const Field* const fieldPtr)
+	inline void Class::DefineField(const Field* const fieldPtr)
 	{
 		this->mFieldPtrVec.push_back(fieldPtr);
 	}

@@ -19,15 +19,14 @@
 namespace vanir
 {
 	template<typename T>
-	inline const type_id GetTypeID(void);
+	const type_id GetTypeID(void);
 
 	const Type* const GetTypeByID(const type_id id);
 
 	const Type* const GetTypeByName(const std::string& name);
 
-	const std::vector<Type*>& GetAllTypeList(void);
+	const std::vector<const Type*>& GetAllTypeList(void);
 
-	void RegisterClass(const Class* const class_);
-	void RegisterEnum(const Enum* const enum_);
+	void RegisterType(const Type* const typePtr);
 };//namespace vanir
 #endif//_VANIR_VANIR_H_
