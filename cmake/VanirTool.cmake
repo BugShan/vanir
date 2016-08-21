@@ -12,32 +12,29 @@ endif()
 set(VANIR_TOOL_EXE ${VANIR_TOOL_BIN_DIR}/vanir)
 
 # vanir parse function
-function(vanir_parse MODULE INPUT_LIST OUTPUT_DIR TEMPLATE HEADER_LIST OPTIONS)
-	foreach(header ${HEADER_LIST})
-		list(APPEND OPTIONS "-I${header}")
+# @param TARGET:			the target that the generated source file attached to
+# @param MODULE:			The Module name, and the tool would generate a class named "{MODULE}MODULE" what inherited from class[vanir::Module].
+# @param INPUT_LIST:		all the source or header files need to parse
+# @param OUTPUT_PATH:		the path of the output file
+# @param TEMPLATE:			the path of the mustache template file
+# @param INCLUDE_DIR_LIST:	the include directores that the clang use to compile all the {INPUT_LIST}
+# @param OPTION:			all the flag option that the clang use to compile all the {INPUT_LIST}
+function(vanir_parse TARGET MODULE INPUT_LIST OUTPUT_PATH TEMPLATE INCLUDE_DIR_LIST OPTIONS)
+	foreach(inc ${INCLUDE_DIR_LIST})
+		list(APPEND OPTIONS "-I${inc}")
 	endforeach()
 
-	set(OUTPUT_LIST "")
-	foreach(input_path ${INPUT_LIST})
-		#output name
-		string(REPLACE "." "_" output_name ${input_path})
-		string(REPLACE "/" "_" output_name ${output_name})
-		set(output_path ${OUTPUT_DIR}/${output_name}.cpp)
+	#create file
+	if(NOT EXISTS ${OUTPUT_PATH})
+		file(WRITE ${OUTPUT_PATH} "")
+	endif()
+	source_group("_vanir_generated" FILES ${OUTPUT_PATH})
+	target_sources(${TARGET} PUBLIC ${OUTPUT_PATH})
 
-		#create file
-		file(WRITE ${output_path} "")
-		list(APPEND OUTPUT_LIST ${output_path})
-		source_group("_vanir_generated" FILES ${output_path})
-
-		add_custom_command(
-			OUTPUT ${output_name}
-			COMMAND echo ${VANIR_TOOL_EXE} -m ${MODULE} -i ${input_path} -o ${output_path} -t ${TEMPLATE} --compile_option "${OPTIONS}" --display_message
-			COMMAND ${VANIR_TOOL_EXE} -m ${MODULE} -i ${input_path} -o ${output_path} -t ${TEMPLATE} --compile_option "${OPTIONS}" --display_message
-			DEPENDS ${input_path}
-			)
-		set_source_files_properties(${output_path}
-			PROPERTIES OBJECT_DEPENDS ${output_name}
-			)
-	endforeach()
-	target_sources(${MODULE} PUBLIC ${OUTPUT_LIST})
+	add_custom_target(
+		${MODULE}_GENERATED
+		COMMAND echo "vanir parsing..."
+		COMMAND ${VANIR_TOOL_EXE} -m ${MODULE} -i ${INPUT_LIST} -o ${OUTPUT_PATH} -t ${TEMPLATE} --compile_option "${OPTIONS}" --display_message
+		)
+	add_dependencies(${TARGET} ${MODULE}_GENERATED)
 endfunction()

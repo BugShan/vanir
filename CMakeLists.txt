@@ -1,10 +1,10 @@
 #********************************************************
 # project vanir
 #
-# global variable list
-# VANIR_ROOT_DIR
-# VANIR_INCLUDE_DEPS
-# LIBVANIR
+# export variable list:
+# -VANIR_ROOT_DIR
+# -VANIR_INCLUDE_DEPS
+# -LIBVANIR
 #********************************************************
 cmake_minimum_required(VERSION 2.8)
 
@@ -12,18 +12,11 @@ project(libvanir CXX)
 
 #option: if build vanir tool project
 option(BUILD_VANIR_TOOL "Build vanir parser tool" OFF)
-if(NOT CMAKE_BUILD_TYPE)
-	set(CMAKE_BUILD_TYPE Debug)
-endif()
-set(CMAKE_CONFIGURATION_TYPES ${CMAKE_BUILD_TYPE})
-string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_UPPER)
-
-# config output directory
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CMAKE_BUILD_TYPE_UPPER} ${CMAKE_BINARY_DIR} )
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CMAKE_BUILD_TYPE_UPPER} ${CMAKE_BINARY_DIR} )
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CMAKE_BUILD_TYPE_UPPER} ${CMAKE_BINARY_DIR} )
 
 set(VANIR_ROOT_DIR	${CMAKE_CURRENT_SOURCE_DIR} CACHE INTERNAL "vanir root dir")
+
+set(CMAKE_MODULE_PATH "${VANIR_ROOT_DIR}/cmake")
+include(Common)
 
 set(VANIR_INCLUDE_DEPS ${VANIR_ROOT_DIR}/include CACHE INTERNAL "vanir include dependence")
 include_directories(${VANIR_INCLUDE_DEPS})

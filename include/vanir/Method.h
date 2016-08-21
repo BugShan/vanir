@@ -1,6 +1,8 @@
 #ifndef	_VANIR_METHOD_H_
 #define	_VANIR_METHOD_H_
 
+#include <vanir/ICall.h>
+
 #include <type_traits>
 #include <initializer_list>
 #include <memory.h>
@@ -23,7 +25,6 @@ namespace vanir
 		};//sturct unpack<0, Is...>
 	};//namespace detail
 
-	class ICall;
 	class Method final
 	{
 	public:
@@ -75,24 +76,6 @@ namespace vanir
 		unsigned char					mBuffer[32];
 	};//class Method
 
-	class ICall
-	{
-	public:
-		virtual ~ICall(void);
-	public:
-		/**
-		 * Get the count of this method's parameter.
-		 */
-		virtual const unsigned int GetParameterCount(void) const = 0;
-	public:
-		/**
-		 * Call this method.
-		 * @param ret:		write the return of this method into ret.
-		 * @param object:	the pointer to the object which owns this method.
-		 * @param args:		the list of the pointers to the arguments passed into this method.
-		 */
-		virtual void Call(void* ret, void* object, std::initializer_list<void*> args)	const = 0;
-	};
 	template<typename T>
 	class MethodCall;
 
@@ -143,7 +126,7 @@ namespace vanir
 
 	inline Method::~Method(void)
 	{
-		mpCall->~ICall();
+		delete mpCall;
 	}
 
 	inline const std::string& Method::GetName(void) const
@@ -156,9 +139,6 @@ namespace vanir
 		this->mpCall->Call(ret, object, args);
 	}
 
-	/*======================================class ICall=================================*/
-	ICall::~ICall(void)
-	{ ; }
 	/*===================================class MethodCall===============================*/
 	template<typename Class, typename Return, typename... Args>
 	inline MethodCall<Return(Class::*)(Args...)>::MethodCall(MethodCall<Return(Class::*)(Args...)>::FunPtr methodPtr)

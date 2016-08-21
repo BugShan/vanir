@@ -5,8 +5,8 @@ namespace vanir
 {
 	const Type* Field::GetFieldTypePtr(void) const
 	{
-		if(mFieldTypeID != Type::INVALID_ID)
-			return GetTypeByID(mFieldTypeID);
+		if(!mFieldTypeName.empty())
+			return GetTypeByName(mFieldTypeName);
 		return nullptr;
 	}
 	void Field::SetValue(const void* const object, const void* const value)

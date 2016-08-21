@@ -11,7 +11,7 @@ namespace vanir
 		struct ParserOption final
 		{
 			std::string					moduleName;
-			std::string					inputFile;
+			std::vector<std::string>	inputFileList;
 			std::string					outputFile;
 			std::string					templateFile;
 

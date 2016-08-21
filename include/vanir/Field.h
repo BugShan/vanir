@@ -61,7 +61,7 @@ namespace vanir
 
 	private:
 		const std::string					mName;
-		const type_id						mFieldTypeID;
+		const std::string					mFieldTypeName;
 
 		const unsigned int					muOffset;
 		const unsigned int					muSize;
@@ -70,7 +70,7 @@ namespace vanir
 	template<typename T, typename ClassType, typename FieldType>
 	inline Field::Field(const std::string& name, const T fieldAddress)
 		: mName(name)
-		, mFieldTypeID(GetTypeID<FieldType>())
+		, mFieldTypeName(type_info<FieldType>::fullname)
 		, muOffset((size_t)(&((ClassType*)0->*fieldAddress)))
 		, muSize(sizeof(FieldType))
 	{ ; }

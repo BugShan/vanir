@@ -51,10 +51,9 @@ namespace vanir
 
 	public:
 		/**
-		 * Set all the base type of this class
-		 * @baseTypeName: the r-value of this name vector
+		 * Set the name of one base type
 		 */
-		inline void SetBaseTypeNameVec(std::vector<std::string>&& baseTypeNameVec);
+		inline void InheritBaseType(const std::string& baseTypeName);
 		/**
 		 * Add a Field defined in this class.
 		 * @param fieldPtr: the pointer of this field
@@ -79,9 +78,9 @@ namespace vanir
 	inline const std::vector<const Method*>& Class::GetMethodPtrVec(void) const
 	{ return this->mMethodPtrVec; }
 
-	inline void Class::SetBaseTypeNameVec(std::vector<std::string>&& baseTypeNameVec)
+	inline void Class::InheritBaseType(const std::string& name)
 	{
-		mBaseTypeNameVec.swap(baseTypeNameVec);
+		mBaseTypeNameVec.push_back(name);
 	}
 	inline void Class::DefineField(const Field* const fieldPtr)
 	{

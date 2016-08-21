@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 		options.add_options()
 			("help", "Display help information")
 			("module,m", po::value<std::string>()->required(), "Module name")
-			("input,i", po::value<std::string>()->required(), "Input file")
+			("input,i", po::value<std::vector<std::string>>()->required(), "Input file list")
 			("output,o", po::value<std::string>()->required(), "Output file")
 			("template,t", po::value<std::string>()->default_value("../mustache/vanir_runtime_template.txt"), "Output file")
 			("compile_option", po::value<std::string>(), "Compile options")
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 
 	vanir::tool::ParserOption opt;
 	opt.moduleName		= cmd_line.at("module").as<std::string>();
-	opt.inputFile		= cmd_line.at("input").as<std::string>();
+	opt.inputFileList	= cmd_line.at("input").as<std::vector<std::string>>();
 	opt.outputFile		= cmd_line.at("output").as<std::string>();
 	opt.templateFile	= cmd_line.at("template").as<std::string>();
 	opt.displayDiagnostics = cmd_line.count("display_message") > 0;

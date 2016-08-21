@@ -16,7 +16,7 @@ namespace vanir
 		Parser::Parser(const ParserOption& option)
 			: mParserOption(option)
 			, mpClangIndex(nullptr)
-			, mpClangTranslationUnit(nullptr)
+			, mArguments()
 			, mClassDeclVec()
 			, mEnumDeclVec()
 			, mTypedefDeclVec()
@@ -30,29 +30,17 @@ namespace vanir
 		{
 			mpClangIndex = ::clang_createIndex(true, mParserOption.displayDiagnostics);
 			
-			std::vector<const char*>	arguments;
 			for(auto& arg : mParserOption.arguments)
-				arguments.push_back(arg.c_str());
-
-			mpClangTranslationUnit = ::clang_createTranslationUnitFromSourceFile(mpClangIndex,
-																				 mParserOption.inputFile.c_str(),
-																				 static_cast<int>(arguments.size()),
-																				 arguments.data(),
-																				 0,
-																				 nullptr);
+				mArguments.push_back(arg.c_str());
 		}
 		void Parser::Release(void)
 		{
-			if(mpClangTranslationUnit)
-			{
-				::clang_disposeTranslationUnit(mpClangTranslationUnit);
-				mpClangTranslationUnit = nullptr;
-			}
 			if(mpClangIndex)
 			{
 				::clang_disposeIndex(mpClangIndex);
 				mpClangIndex = nullptr;
 			}
+			mArguments.clear();
 			mClassDeclVec.clear();
 			mEnumDeclVec.clear();
 			mTypedefDeclVec.clear();
@@ -60,8 +48,18 @@ namespace vanir
 
 		void Parser::Parse()
 		{
-			ClangCursor cursor(::clang_getTranslationUnitCursor(mpClangTranslationUnit));
-			this->EatNamespace(cursor);
+			for(const auto& input : mParserOption.inputFileList)
+			{
+				auto clangTranslationUnit = ::clang_createTranslationUnitFromSourceFile(mpClangIndex,
+																						input.c_str(),
+																						mArguments.size(),
+																						mArguments.data(),
+																						0,
+																						nullptr);
+				ClangCursor cursor(::clang_getTranslationUnitCursor(clangTranslationUnit));
+				this->EatNamespace(cursor);
+				::clang_disposeTranslationUnit(clangTranslationUnit);
+			}
 			this->WriteToFile();
 		}
 
@@ -147,6 +145,7 @@ namespace vanir
 		}
 		void Parser::WriteToFile(void)
 		{
+			//read mustache template file
 			std::string templateContext;
 			{
 				std::ifstream input(mParserOption.templateFile);
@@ -165,43 +164,58 @@ namespace vanir
 			}
 			Mustache::Mustache<std::string>	mustacheTemplate(templateContext);
 
-			std::string headerFileName = mParserOption.inputFile;
-			std::replace(headerFileName.begin(), headerFileName.end(), '.', '_');
-			std::replace(headerFileName.begin(), headerFileName.end(), '/', '_');
+			//write mustache tree data
 			Mustache::Data<std::string> root(Mustache::Data<std::string>::Type::Object);
 			root["MODULE_NAME"] = mParserOption.moduleName;
-			root["INPUT_HEADER_PATH"] = mParserOption.inputFile;
-			root["INPUT_HEADER_NAME"] = headerFileName;
-
-			Mustache::Data<std::string> classNodeList(Mustache::Data<std::string>::Type::List);
-			for(auto& classDecl : mClassDeclVec)
-			{
-				Mustache::Data<std::string> classNode(Mustache::Data<std::string>::Type::Object);
-				classNode["CLASS_NAME"] = classDecl.fullName;
-
-				Mustache::Data<std::string> fieldNodeList(Mustache::Data<std::string>::Type::List);
-				for(auto& fieldName : classDecl.fieldNameVec)
+			{//header list
+				Mustache::Data<std::string> headerListNode(Mustache::Data<std::string>::Type::List);
+				for(const auto& header : mParserOption.inputFileList)
 				{
-					Mustache::Data<std::string> fieldNode(Mustache::Data<std::string>::Type::Object);
-					fieldNode["CLASS_FIELD_NAME"] = fieldName;
-					fieldNodeList << std::move(fieldNode);
+					Mustache::Data<std::string> headerNode(Mustache::Data<std::string>::Type::Object);
+					headerNode["HEADER"] = header;
+					headerListNode << std::move(headerNode);
 				}
-				classNode["CLASS_FIELD_LIST"] = std::move(fieldNodeList);
-
-				Mustache::Data<std::string> methodNodeList(Mustache::Data<std::string>::Type::List);
-				for(auto& methodName : classDecl.methodNameVec)
-				{
-					Mustache::Data<std::string> methodNode(Mustache::Data<std::string>::Type::Object);
-					methodNode["CLASS_METHOD_NAME"] = methodName;
-					methodNodeList << std::move(methodNode);
-				}
-				classNode["CLASS_METHOD_LIST"] = std::move(methodNodeList);
-
-				classNodeList << std::move(classNode);
+				root["HEADER_LIST"] = std::move(headerListNode);
 			}
-			root["CLASS_RUNTIME_LIST"] = std::move(classNodeList);
+			{//type info list
+				Mustache::Data<std::string> typeInfoListNode(Mustache::Data<std::string>::Type::List);
+				for(const auto& classDecl : mClassDeclVec)
+				{
+					Mustache::Data<std::string> typeInfoNode(Mustache::Data<std::string>::Type::Object);
+					typeInfoNode["TYPE_NAME"] = classDecl.fullName;
+					typeInfoListNode << std::move(typeInfoNode);
+				}
+				root["TYPE_INFO_LIST"] = std::move(typeInfoListNode);
+			}
+			{//class list
+				Mustache::Data<std::string> classListNode(Mustache::Data<std::string>::Type::List);
+				for(auto& classDecl : mClassDeclVec)
+				{
+					Mustache::Data<std::string> classNode(Mustache::Data<std::string>::Type::Object);
+					classNode["CLASS_NAME"] = classDecl.fullName;
 
-			{
+					Mustache::Data<std::string> fieldListNode(Mustache::Data<std::string>::Type::List);
+					for(auto& fieldName : classDecl.fieldNameVec)
+					{
+						Mustache::Data<std::string> fieldNode(Mustache::Data<std::string>::Type::Object);
+						fieldNode["CLASS_FIELD_NAME"] = fieldName;
+						fieldListNode << std::move(fieldNode);
+					}
+					classNode["CLASS_FIELD_LIST"] = std::move(fieldListNode);
+
+					Mustache::Data<std::string> methodListNode(Mustache::Data<std::string>::Type::List);
+					for(auto& methodName : classDecl.methodNameVec)
+					{
+						Mustache::Data<std::string> methodNode(Mustache::Data<std::string>::Type::Object);
+						methodNode["CLASS_METHOD_NAME"] = methodName;
+						methodListNode << std::move(methodNode);
+					}
+					classNode["CLASS_METHOD_LIST"] = std::move(methodListNode);
+					classListNode << std::move(classNode);
+				}
+				root["CLASS_LIST"] = std::move(classListNode);
+			}
+			{//write to file
 				std::ofstream output(mParserOption.outputFile);
 				output << mustacheTemplate.render(root);
 				output.close();

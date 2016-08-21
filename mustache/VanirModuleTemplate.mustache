@@ -1,0 +1,44 @@
+#include <vanir/Vanir.h>
+#include <vanir/Class.h>
+#include <vanir/Enum.h>
+#include <vanir/Method.h>
+#include <vanir/Field.h>
+
+{{#HEADER_LIST}}
+#include <{{HEADER}}>
+{{/HEADER_LIST}}
+using namespace vanir;
+{{#TYPE_INFO_LIST}}
+template<>
+const std::string type_info<{{TYPE_NAME}}>::fullname = "{{TYPE_NAME}}";
+{{/TYPE_INFO_LIST}}
+
+IMPORT_MODULE({{MODULE_NAME}});
+
+{{MODULE_NAME}}Module* {{MODULE_NAME}}Module::spMyself = new {{MODULE_NAME}}Module;
+
+{{MODULE_NAME}}Module::{{MODULE_NAME}}Module(void)
+	: Module("{{MODULE_NAME}}")
+{ ; }
+{{MODULE_NAME}}Module::~{{MODULE_NAME}}Module(void)
+{ ; }
+
+{{MODULE_NAME}}Module& {{MODULE_NAME}}Module::GetMe(void)
+{
+	return *spMyself;
+}
+
+void {{MODULE_NAME}}Module::Init(void)
+{
+	{{#CLASS_LIST}}{
+		if(!GetTypeByName("{{CLASS_NAME}}"))
+		{
+			Class* class_ = new Class("{{CLASS_NAME}}");
+			//class field{{#CLASS_FIELD_LIST}}
+			class_->DefineField(new Field("{{CLASS_FIELD_NAME}}", &{{CLASS_NAME}}::{{CLASS_FIELD_NAME}}));{{/CLASS_FIELD_LIST}}
+			//class method{{#CLASS_METHOD_LIST}}
+			class_->DefineMethod(new Method("{{CLASS_METHOD_NAME}}", &{{CLASS_NAME}}::{{CLASS_METHOD_NAME}}));{{/CLASS_METHOD_LIST}}
+			RegisterType(class_);
+		}
+	}{{/CLASS_LIST}}
+}

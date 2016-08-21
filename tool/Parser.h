@@ -31,7 +31,7 @@ namespace vanir
 		private:
 			ParserOption					mParserOption;
 			CXIndex							mpClangIndex;
-			CXTranslationUnit				mpClangTranslationUnit;
+			std::vector<const char*>		mArguments;
 
 			std::vector<ClassDecl>			mClassDeclVec;
 			std::vector<EnumDecl>			mEnumDeclVec;
