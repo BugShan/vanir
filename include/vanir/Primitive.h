@@ -7,8 +7,12 @@ namespace vanir
 {
 	class Primitive : public Type
 	{
-	public:
-		Primitive(const std::string& fullName);
+		template<typename T>
+		friend const Type* const RegisterType(void);
+		template<typename T>
+		friend Type* CreateType(void);
+	private:
+		Primitive(const std::string& fullName, const unsigned int size);
 		virtual ~Primitive(void) override;
 	};//class Primitive
 };//namespace vanir

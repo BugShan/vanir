@@ -1,6 +1,6 @@
-#include <vanir/Primitive.h>
 #include <vanir/Vanir.h>
-#include <vanir/Class.h>
+#include <vanir/Primitive.h>
+#include <vanir/VanirInternal.h>
 #include <map>
 
 namespace vanir
@@ -10,19 +10,19 @@ namespace vanir
 
 	void InitVanir(void)
 	{
-		RegisterType(new Primitive("bool"));
-		RegisterType(new Primitive("char"));
-		RegisterType(new Primitive("unsigned char"));
-		RegisterType(new Primitive("short"));
-		RegisterType(new Primitive("unsigned short"));
-		RegisterType(new Primitive("int"));
-		RegisterType(new Primitive("unsigned int"));
-		RegisterType(new Primitive("long"));
-		RegisterType(new Primitive("unsigned long"));
-		RegisterType(new Primitive("long long"));
-		RegisterType(new Primitive("unsigned long long"));
-		RegisterType(new Primitive("float"));
-		RegisterType(new Primitive("double"));
+		RegisterType<bool>();
+		RegisterType<char>();
+		RegisterType<unsigned char>();
+		RegisterType<short>();
+		RegisterType<unsigned short>();
+		RegisterType<int>();
+		RegisterType<unsigned int>();
+		RegisterType<long>();
+		RegisterType<unsigned long>();
+		RegisterType<long long>();
+		RegisterType<unsigned long long>();
+		RegisterType<float>();
+		RegisterType<double>();
 	}
 	void LoadModule(Module& module)
 	{

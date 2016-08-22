@@ -1,6 +1,8 @@
 #include "test.h"
 #include <iostream>
 #include <vanir/Vanir.h>
+#include <vanir/Type.h>
+#include <vanir/Class.h>
 #include <vanir/Field.h>
 #include <vanir/Method.h>
 

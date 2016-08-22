@@ -3,6 +3,7 @@
 #include <vanir/Enum.h>
 #include <vanir/Method.h>
 #include <vanir/Field.h>
+#include <vanir/VanirInternal.h>
 
 {{#HEADER_LIST}}
 #include <{{HEADER}}>
@@ -33,7 +34,7 @@ void {{MODULE_NAME}}Module::Init(void)
 	{{#CLASS_LIST}}{
 		if(!GetTypeByName("{{CLASS_NAME}}"))
 		{
-			Class* class_ = new Class("{{CLASS_NAME}}");
+			Class* class_ = static_cast<Class*>(CreateType<{{CLASS_NAME}}>());
 			//class field{{#CLASS_FIELD_LIST}}
 			class_->DefineField(new Field("{{CLASS_FIELD_NAME}}", &{{CLASS_NAME}}::{{CLASS_FIELD_NAME}}));{{/CLASS_FIELD_LIST}}
 			//class method{{#CLASS_METHOD_LIST}}

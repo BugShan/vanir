@@ -10,10 +10,10 @@ namespace vanir
 	class Method;
 	class Class final : public Type
 	{
-	public:
-		Class(const std::string& fullName);
-		virtual ~Class(void) override;
-
+		template<typename T>
+		friend const Type* const RegisterType(void);
+		template<typename T>
+		friend Type* CreateType(void);
 	public:
 		/**
 		 * Get the name lists of all base type
@@ -64,6 +64,10 @@ namespace vanir
 		 * @param methodPtr: the pointer of the method
 		 */
 		inline void DefineMethod(const Method* const methodPtr);
+
+	private:
+		Class(const std::string& fullName, const unsigned int size);
+		virtual ~Class(void) override;
 
 	private:
 		std::vector<std::string>			mBaseTypeNameVec;

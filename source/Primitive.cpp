@@ -21,8 +21,8 @@ namespace vanir
 	PRIMITIVE_TYPE_INFO(float);
 	PRIMITIVE_TYPE_INFO(double);
 
-	Primitive::Primitive(const std::string& fullName)
-		: Type(fullName, Type::TYPE_KIND_PRIMITIVE)
+	Primitive::Primitive(const std::string& fullName, const unsigned int size)
+		: Type(fullName, size, Type::TYPE_KIND_PRIMITIVE)
 	{ ; }
 	Primitive::~Primitive(void)
 	{ ; }

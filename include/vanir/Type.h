@@ -1,24 +1,13 @@
 #ifndef	_VANIR_TYPE_H_
 #define	_VANIR_TYPE_H_
 
-#include <vanir/Common.h>
+#include <vanir/Vanir.h>
 #include <string>
 
 namespace vanir
 {
 	class Type
 	{
-	public:
-		 /**
-		  * The constructor.
-		  * @param typeName: the name of this Type
-		  */
-		 Type(const std::string& fullName, const unsigned int typeKind);
-		 /**
-		  * The destructor.
-		  */
-		virtual ~Type(void);
-
 	public:
 		/**
 		 * Get the id of this Type.
@@ -32,14 +21,10 @@ namespace vanir
 		 * Get the fully qualified name of this Type.
 		 */
 		inline const std::string& GetFullName(void)	const;
-
-	public:
 		/**
-		 * Determine if the type of current is same as the specified.
+		 * Get the size of this Type.
 		 */
-		inline const bool operator =(const Type&) const;
-
-	public:
+		inline const unsigned int GetSize(void) const;
 		/**
 		 * Determine if the Type is a Class or Struct.
 		 */
@@ -58,7 +43,20 @@ namespace vanir
 		inline const bool IsPrimitive(void) const;
 
 	public:
+		/**
+		 * Determine if the type of current is same as the specified.
+		 */
+		inline const bool operator =(const Type&) const;
+
+	public:
 		enum { INVALID_ID = 0 };
+
+	protected:
+		Type(const std::string& fullName, const unsigned int size, const unsigned int typeKind);
+		/**
+		 * The destructor.
+		 */
+		virtual ~Type(void);
 	protected:
 		enum
 		{
@@ -72,6 +70,7 @@ namespace vanir
 		const std::string					mName;
 		const std::string					mFullName;
 		const unsigned int					muTypeKind;
+		const unsigned int					muSize;
 
 		static type_id						suNextID;
 	};//class Type
