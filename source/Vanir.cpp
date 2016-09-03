@@ -10,19 +10,19 @@ namespace vanir
 
 	void InitVanir(void)
 	{
-		RegisterType<bool>();
-		RegisterType<char>();
-		RegisterType<unsigned char>();
-		RegisterType<short>();
-		RegisterType<unsigned short>();
-		RegisterType<int>();
-		RegisterType<unsigned int>();
-		RegisterType<long>();
-		RegisterType<unsigned long>();
-		RegisterType<long long>();
-		RegisterType<unsigned long long>();
-		RegisterType<float>();
-		RegisterType<double>();
+		Internal::RegisterType<bool>();
+		Internal::RegisterType<char>();
+		Internal::RegisterType<unsigned char>();
+		Internal::RegisterType<short>();
+		Internal::RegisterType<unsigned short>();
+		Internal::RegisterType<int>();
+		Internal::RegisterType<unsigned int>();
+		Internal::RegisterType<long>();
+		Internal::RegisterType<unsigned long>();
+		Internal::RegisterType<long long>();
+		Internal::RegisterType<unsigned long long>();
+		Internal::RegisterType<float>();
+		Internal::RegisterType<double>();
 	}
 	void LoadModule(Module& module)
 	{
@@ -53,7 +53,7 @@ namespace vanir
 		return gTypeVec;
 	}
 
-	void RegisterType(const Type* const typePtr)
+	void Internal::RegisterType(const Type* const typePtr)
 	{
 		auto find_it = gTypeMap.find(typePtr->GetFullName());
 		if(find_it == gTypeMap.end())

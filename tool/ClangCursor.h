@@ -16,16 +16,23 @@ namespace vanir
 			inline ~ClangCursor(void);
 
 		public:
+			inline const CXCursor& GetHandle(void) const;
 			inline const CXCursorKind GetKind(void)	const;
 			inline const bool	IsDefinition(void)	const;
 			inline const bool	IsConstMethod(void)	const;
 			inline const bool	IsStaticMethod(void)const;
 
 		public:
+			const std::string GetKindStr(void) const;
 			const std::string GetDisplayName(void) const;
 			const std::string GetSpelling(void) const;
 			const std::vector<ClangCursor> GetChildren(void) const;
+			const ClangCursor GetParentCursor(void) const;
+			const CX_CXXAccessSpecifier GetAccessSpecifier(void) const;
+			const unsigned int GetFieldOffset(void) const;
+			const ClangCursor GetDeclareCursor(void) const;
 			const ClangType	GetClangType(void) const;
+			const ClangType GetTypedefUnderlyingType(void) const;
 
 		private:
 			CXCursor			mHandle;
@@ -37,6 +44,10 @@ namespace vanir
 		inline ClangCursor::~ClangCursor(void)
 		{ ; }
 
+		inline const CXCursor& ClangCursor::GetHandle(void) const
+		{
+			return this->mHandle;
+		}
 		inline const CXCursorKind ClangCursor::GetKind(void) const
 		{
 			return mHandle.kind;

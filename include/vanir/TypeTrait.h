@@ -1,16 +1,25 @@
 #ifndef	_VANIR_TYPETRAIT_H_
 #define	_VANIR_TYPETRAIT_H_
 
+#include <type_traits>
+
 namespace vanir
 {
+	template<typename T>
+	struct remove_all
+	{
+		using type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+	};
+
 	class TypeTrait final
 	{
 	public:
 		enum
 		{
-			ARRAY		= 1 << 0,
-			LEFT_REF	= 1 << 1,
-			RIGHT_REF	= 1 << 2,
+			INVALIDE	= 1 << 0,	//when type is not registered runtime class
+			ARRAY		= 1 << 1,
+			LEFT_REF	= 1 << 2,
+			RIGHT_REF	= 1 << 3,
 			POINTER		= 1 << 4,
 
 			REFERENCE	= LEFT_REF | RIGHT_REF,

@@ -8,12 +8,9 @@ namespace vanir
 {
 	class Field;
 	class Method;
-	class Class final : public Type
+	class Class : public Type
 	{
-		template<typename T>
-		friend const Type* const RegisterType(void);
-		template<typename T>
-		friend Type* CreateType(void);
+		friend class Internal;
 	public:
 		/**
 		 * Get the name lists of all base type
@@ -65,7 +62,7 @@ namespace vanir
 		 */
 		inline void DefineMethod(const Method* const methodPtr);
 
-	private:
+	protected:
 		Class(const std::string& fullName, const unsigned int size);
 		virtual ~Class(void) override;
 

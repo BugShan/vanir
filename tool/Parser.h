@@ -2,7 +2,6 @@
 #define	_VANIR_TOOL_PARSER_H_
 
 #include "ParserOption.h"
-#include "TypeDecl.h"
 #include <clang-c/Index.h>
 #include <vector>
 
@@ -25,6 +24,8 @@ namespace vanir
 		private:
 			void EatNamespace(const ClangCursor& cursor);
 			void EatClass(const ClangCursor& cursor);
+			void EatExternalClass(const ClangCursor& cursor);
+			void EatTemplateClass(const ClangCursor& cursor);
 			void EatEnum(const ClangCursor& cursor);
 			void WriteToFile(void);
 
@@ -32,10 +33,6 @@ namespace vanir
 			ParserOption					mParserOption;
 			CXIndex							mpClangIndex;
 			std::vector<const char*>		mArguments;
-
-			std::vector<ClassDecl>			mClassDeclVec;
-			std::vector<EnumDecl>			mEnumDeclVec;
-			std::vector<TypedefDecl>		mTypedefDeclVec;
 		};//class Parser
 	};//namespace tool
 };//namespace vanir

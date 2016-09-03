@@ -7,10 +7,7 @@ namespace vanir
 {
 	class Primitive : public Type
 	{
-		template<typename T>
-		friend const Type* const RegisterType(void);
-		template<typename T>
-		friend Type* CreateType(void);
+		friend class Internal;
 	private:
 		Primitive(const std::string& fullName, const unsigned int size);
 		virtual ~Primitive(void) override;

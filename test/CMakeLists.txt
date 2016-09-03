@@ -17,11 +17,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 add_executable(test_exe ${SOURCE} ${HEADER})
 target_link_libraries(test_exe ${LIBVANIR})
 
-vanir_parse(test_exe
-			"Test"
-			${HEADER}
-			"${CMAKE_BINARY_DIR}/Generator/output.cpp"
-			"${VANIR_ROOT_DIR}/mustache/VanirModuleTemplate.mustache"
-			${VANIR_INCLUDE_DEPS}
-			""
+vanir_parse(TARGET test_exe
+			MODULE "Test"
+			INPUT_LIST ${HEADER}
+			OUTPUT_PATH "${CMAKE_BINARY_DIR}/Generator/output.cpp"
+			TEMPLATE "${VANIR_ROOT_DIR}/mustache/VanirModuleTemplate.mustache"
+			INCLUDE_DIR_LIST ${VANIR_INCLUDE_DEPS}
+			OPTION""
 			)

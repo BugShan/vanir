@@ -57,21 +57,21 @@ StringType escape(const StringType& s) {
     ret.reserve(s.size()*2);
     for (const auto ch : s) {
         switch (static_cast<char>(ch)) {
-            case '&':
-                ret.append("&amp;");
-                break;
-            case '<':
-                ret.append("&lt;");
-                break;
-            case '>':
-                ret.append("&gt;");
-                break;
-            case '\"':
-                ret.append("&quot;");
-                break;
-            case '\'':
-                ret.append("&apos;");
-                break;
+            //case '&':
+            //    ret.append("&amp;");
+            //    break;
+            //case '<':
+            //    ret.append("&lt;");
+            //    break;
+            //case '>':
+            //    ret.append("&gt;");
+            //    break;
+            //case '\"':
+            //    ret.append("&quot;");
+            //    break;
+            //case '\'':
+            //    ret.append("&apos;");
+            //    break;
             default:
                 ret.append(1, ch);
                 break;

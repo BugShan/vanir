@@ -20,7 +20,7 @@ namespace vanir
 	template<typename T>
 	struct type_info
 	{
-		static const std::string	fullname;
+		static const std::string	fullName;
 	};//struct type_info
 
 	/**
@@ -57,7 +57,7 @@ namespace vanir
 	template<typename T>
 	const Type* const GetType(void)
 	{
-		const std::string& fullName = type_info<T>::fullname;
+		const std::string& fullName = type_info<T>::fullName;
 		return GetTypeByName(fullName);
 	}
 };//namespace vanir

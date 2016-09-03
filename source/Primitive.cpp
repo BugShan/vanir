@@ -3,7 +3,7 @@
 
 #define PRIMITIVE_TYPE_INFO(t)	\
 template<>\
-const std::string type_info<t>::fullname = #t
+const std::string type_info<t>::fullName = #t
 
 namespace vanir
 {

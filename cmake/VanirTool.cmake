@@ -1,3 +1,5 @@
+include(CMakeParseArguments)
+
 # vanir tool path on different platform
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 	set(VANIR_TOOL_BIN_DIR ${VANIR_ROOT_DIR}/bin/mac)
@@ -19,22 +21,23 @@ set(VANIR_TOOL_EXE ${VANIR_TOOL_BIN_DIR}/vanir)
 # @param TEMPLATE:			the path of the mustache template file
 # @param INCLUDE_DIR_LIST:	the include directores that the clang use to compile all the {INPUT_LIST}
 # @param OPTION:			all the flag option that the clang use to compile all the {INPUT_LIST}
-function(vanir_parse TARGET MODULE INPUT_LIST OUTPUT_PATH TEMPLATE INCLUDE_DIR_LIST OPTIONS)
-	foreach(inc ${INCLUDE_DIR_LIST})
+function(vanir_parse)
+	cmake_parse_arguments(PARAM "" "TARGET;MODULE;OUTPUT_PATH;TEMPLATE" "INPUT_LIST;INCLUDE_DIR_LIST;OPTIONS" ${ARGN})
+	foreach(inc ${PARAM_INCLUDE_DIR_LIST})
 		list(APPEND OPTIONS "-I${inc}")
 	endforeach()
 
 	#create file
-	if(NOT EXISTS ${OUTPUT_PATH})
-		file(WRITE ${OUTPUT_PATH} "")
+	if(NOT EXISTS ${PARAM_OUTPUT_PATH})
+		file(WRITE ${PARAM_OUTPUT_PATH} "")
 	endif()
-	source_group("_vanir_generated" FILES ${OUTPUT_PATH})
-	target_sources(${TARGET} PUBLIC ${OUTPUT_PATH})
+	source_group("_vanir_generated" FILES ${PARAM_OUTPUT_PATH})
+	target_sources(${PARAM_TARGET} PUBLIC ${PARAM_OUTPUT_PATH})
 
 	add_custom_target(
-		${MODULE}_GENERATED
+		${PARAM_MODULE}_GENERATED
 		COMMAND echo "vanir parsing..."
-		COMMAND ${VANIR_TOOL_EXE} -m ${MODULE} -i ${INPUT_LIST} -o ${OUTPUT_PATH} -t ${TEMPLATE} --compile_option "${OPTIONS}" --display_message
+		COMMAND ${VANIR_TOOL_EXE} -m ${PARAM_MODULE} -i ${PARAM_INPUT_LIST} -o ${PARAM_OUTPUT_PATH} -t ${PARAM_TEMPLATE} --compile_option "${PARAM_OPTIONS}" --display_message
 		)
-	add_dependencies(${TARGET} ${MODULE}_GENERATED)
+	add_dependencies(${PARAM_TARGET} ${PARAM_MODULE}_GENERATED)
 endfunction()

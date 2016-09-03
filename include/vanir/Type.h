@@ -8,6 +8,10 @@ namespace vanir
 {
 	class Type
 	{
+		template<typename T>
+		friend const Type* const RegisterType(void);
+		template<typename T>
+		friend Type* CreateType(void);
 	public:
 		/**
 		 * Get the id of this Type.
