@@ -1,37 +1,25 @@
 #include "test.h"
 #include <iostream>
 #include <vanir/Vanir.h>
+#include <vanir/Type.h>
+#include <vanir/Class.h>
 #include <vanir/Field.h>
 #include <vanir/Method.h>
 
-using namespace vanir;
+namespace test
+{
+	void Test::foo(void)
+	{}
+};
 
 IMPORT_MODULE(Test);
 
-namespace test
-{
-	void Base1::foo1(const int i)
-	{
-		std::cout << "Base1::foo1: " << i << std::endl;
-	}
-
-	void Base2::foo2(const float f)
-	{
-		std::cout << "Base2::foo2: " << f << std::endl;
-	}
-
-	void Test::foo2(const float f)
-	{
-		std::cout << "Test::foo2: " << f << std::endl;
-	}
-};//namespace test
-
-
+using namespace vanir;
 int main(void)
 {
 	vanir::InitVanir();
 	vanir::LoadModule(TestModule::GetMe());
-
+	
 	std::cout << "Vanir Test" << std::endl;
 	const auto& type_list = vanir::GetAllTypeList();
 	for(const auto typePtr : type_list)

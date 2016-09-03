@@ -13,11 +13,12 @@ namespace vanir
 			return fullName.substr(pos, fullName.size() - pos);
 	}
 
-	Type::Type(const std::string& fullName, const unsigned int typeKind)
+	Type::Type(const std::string& fullName, const unsigned int size, const unsigned int typeKind)
 		: muID(suNextID++)
 		, mName(SubStrName(fullName))
 		, mFullName(fullName)
 		, muTypeKind(typeKind)
+		, muSize(size)
 	{ ; }
 
 	Type::~Type(void)

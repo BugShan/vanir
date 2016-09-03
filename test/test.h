@@ -3,23 +3,13 @@
 
 namespace test
 {
-	class Base1
+	class Test
 	{
 	public:
-		void foo1(const int);
+		void foo(void);
+	private:
 		int i;
-	};//class Base1
-	class Base2
-	{
-	public:
-		virtual void foo2(const float);
-		float f;
+		int j;
 	};
-	class Test : public Base1, public Base2
-	{
-	public:
-		virtual void foo2(const float) override;
-		char c;
-	};//class Test
-};//namespace test
+};
 #endif//_TEST_H_

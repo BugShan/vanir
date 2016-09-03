@@ -8,12 +8,9 @@ namespace vanir
 {
 	class Field;
 	class Method;
-	class Class final : public Type
+	class Class : public Type
 	{
-	public:
-		Class(const std::string& fullName);
-		virtual ~Class(void) override;
-
+		friend class Internal;
 	public:
 		/**
 		 * Get the name lists of all base type
@@ -64,6 +61,10 @@ namespace vanir
 		 * @param methodPtr: the pointer of the method
 		 */
 		inline void DefineMethod(const Method* const methodPtr);
+
+	protected:
+		Class(const std::string& fullName, const unsigned int size);
+		virtual ~Class(void) override;
 
 	private:
 		std::vector<std::string>			mBaseTypeNameVec;

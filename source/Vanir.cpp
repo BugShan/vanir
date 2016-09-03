@@ -1,6 +1,6 @@
-#include <vanir/Primitive.h>
 #include <vanir/Vanir.h>
-#include <vanir/Class.h>
+#include <vanir/Primitive.h>
+#include <vanir/VanirInternal.h>
 #include <map>
 
 namespace vanir
@@ -10,19 +10,19 @@ namespace vanir
 
 	void InitVanir(void)
 	{
-		RegisterType(new Primitive("bool"));
-		RegisterType(new Primitive("char"));
-		RegisterType(new Primitive("unsigned char"));
-		RegisterType(new Primitive("short"));
-		RegisterType(new Primitive("unsigned short"));
-		RegisterType(new Primitive("int"));
-		RegisterType(new Primitive("unsigned int"));
-		RegisterType(new Primitive("long"));
-		RegisterType(new Primitive("unsigned long"));
-		RegisterType(new Primitive("long long"));
-		RegisterType(new Primitive("unsigned long long"));
-		RegisterType(new Primitive("float"));
-		RegisterType(new Primitive("double"));
+		Internal::RegisterType<bool>();
+		Internal::RegisterType<char>();
+		Internal::RegisterType<unsigned char>();
+		Internal::RegisterType<short>();
+		Internal::RegisterType<unsigned short>();
+		Internal::RegisterType<int>();
+		Internal::RegisterType<unsigned int>();
+		Internal::RegisterType<long>();
+		Internal::RegisterType<unsigned long>();
+		Internal::RegisterType<long long>();
+		Internal::RegisterType<unsigned long long>();
+		Internal::RegisterType<float>();
+		Internal::RegisterType<double>();
 	}
 	void LoadModule(Module& module)
 	{
@@ -53,7 +53,7 @@ namespace vanir
 		return gTypeVec;
 	}
 
-	void RegisterType(const Type* const typePtr)
+	void Internal::RegisterType(const Type* const typePtr)
 	{
 		auto find_it = gTypeMap.find(typePtr->GetFullName());
 		if(find_it == gTypeMap.end())

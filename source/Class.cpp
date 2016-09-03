@@ -1,13 +1,12 @@
 #include <vanir/Class.h>
-#include <vanir/Vanir.h>
 #include <vanir/Field.h>
 #include <vanir/Method.h>
 
 
 namespace vanir
 {
-	Class::Class(const std::string& fullName)
-		: Type(fullName, Type::TYPE_KIND_CLASS)
+	Class::Class(const std::string& fullName, const unsigned int size)
+		: Type(fullName, size, Type::TYPE_KIND_CLASS)
 		, mBaseTypeNameVec()
 		, mMethodPtrVec()
 		, mFieldPtrVec()

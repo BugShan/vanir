@@ -1,13 +1,14 @@
 #include "Parser.h"
 #include "ClangCursor.h"
 #include "ClangType.h"
+#include "Declare.h"
 #include "mustache/Mustache.h"
 
 #include <iostream>
 #include <fstream>
 
-#define LOG_COLOR_RED	"\033[31m"
-#define LOG_COLOR_RESET	"\033[0m"
+const char* const LOG_COLOR_RED				= "\033[31m";
+const char* const LOG_COLOR_RESET			= "\033[0m";
 
 namespace vanir
 {
@@ -17,9 +18,6 @@ namespace vanir
 			: mParserOption(option)
 			, mpClangIndex(nullptr)
 			, mArguments()
-			, mClassDeclVec()
-			, mEnumDeclVec()
-			, mTypedefDeclVec()
 		{ ; }
 		Parser::~Parser(void)
 		{
@@ -41,9 +39,6 @@ namespace vanir
 				mpClangIndex = nullptr;
 			}
 			mArguments.clear();
-			mClassDeclVec.clear();
-			mEnumDeclVec.clear();
-			mTypedefDeclVec.clear();
 		}
 
 		void Parser::Parse()
@@ -72,76 +67,44 @@ namespace vanir
 				{
 					this->EatNamespace(child);
 				}
-				else if((kind == ::CXCursor_ClassDecl || kind == ::CXCursor_StructDecl)
-					 && child.IsDefinition())
-				{//the actual definition of a class or a struct
-					this->EatClass(child);
+				else if((kind == ::CXCursor_ClassDecl || kind == ::CXCursor_StructDecl))
+				{
+					if(child.IsDefinition())
+						this->EatClass(child);
+					else
+						this->EatExternalClass(child);
+				}
+				else if(kind == ::CXCursor_ClassTemplate)
+				{
+					if(child.IsDefinition())
+						this->EatTemplateClass(child);
+					else
+						this->EatExternalClass(child);
 				}
 				else if(kind == ::CXCursor_EnumDecl && child.IsDefinition())
 				{
 					this->EatEnum(child);
 				}
-				else if(kind == ::CXCursor_TypedefDecl)
+				else if(kind == ::CXCursor_TypedefDecl || cursor.GetKind() == ::CXCursor_TypeAliasDecl)
 				{
 				}
 			}
 		}
 		void Parser::EatClass(const ClangCursor& cursor)
 		{
-			ClassDecl decl;
-			decl.className = cursor.GetDisplayName();
-			decl.fullName = cursor.GetClangType().GetSpelling();
-			for(auto& child : cursor.GetChildren())
-			{
-				switch(child.GetKind())
-				{
-				case ::CXCursor_CXXBaseSpecifier:
-				{
-					decl.baseNameVec.push_back(child.GetClangType().GetSpelling());
-				}break;
-				case ::CXCursor_Constructor:
-				{
-					//TODO:: constructor
-				}break;
-				case ::CXCursor_FieldDecl:
-				{
-					decl.fieldNameVec.push_back(child.GetDisplayName());
-				}break;
-				case ::CXCursor_VarDecl:
-				{
-					//TODO:: static field
-				}break;
-				case ::CXCursor_CXXMethod:
-				{
-					if(child.IsStaticMethod())
-					{
-						//TODO:: static method
-					}
-					else
-					{
-						decl.methodNameVec.push_back(child.GetSpelling());
-					}
-				}break;
-				case ::CXCursor_EnumDecl:
-				{
-					//enum defiend within a class
-					if(child.IsDefinition())
-						this->EatEnum(child);
-				}
-				default:
-					break;
-				}
-			}
-			mClassDeclVec.push_back(decl);
+			ClassDecl* declPtr = new ClassDecl(cursor);
+			if(declPtr->Init())
+				Declare::AddDeclare(*declPtr);
 		}
+		void Parser::EatTemplateClass(const ClangCursor& cursor)
+		{ ; }
+		void Parser::EatExternalClass(const ClangCursor& cursor)
+		{ ; }
 		void Parser::EatEnum(const ClangCursor& cursor)
 		{
-			const std::string spelling = cursor.GetClangType().GetSpelling();
-			//skip anonymous enum
-			if(std::string::npos == spelling.find("anonymous enum at"))
-			{
-
-			}
+			EnumDecl* declPtr = new EnumDecl(cursor);
+			if(declPtr->Init())
+				Declare::AddDeclare(*declPtr);
 		}
 		void Parser::WriteToFile(void)
 		{
@@ -179,35 +142,41 @@ namespace vanir
 			}
 			{//type info list
 				Mustache::Data<std::string> typeInfoListNode(Mustache::Data<std::string>::Type::List);
-				for(const auto& classDecl : mClassDeclVec)
+				for(const auto* declPtr : Declare::GetAllDeclareVec())
 				{
 					Mustache::Data<std::string> typeInfoNode(Mustache::Data<std::string>::Type::Object);
-					typeInfoNode["TYPE_NAME"] = classDecl.fullName;
+					typeInfoNode["TYPE_NAME"] = declPtr->GetName();
 					typeInfoListNode << std::move(typeInfoNode);
 				}
 				root["TYPE_INFO_LIST"] = std::move(typeInfoListNode);
 			}
 			{//class list
 				Mustache::Data<std::string> classListNode(Mustache::Data<std::string>::Type::List);
-				for(auto& classDecl : mClassDeclVec)
+				for(const auto* declPtr : Declare::GetAllDeclareVec())
 				{
+					if(declPtr->GetKind() != Declare::DeclareKind::Class || declPtr->GetKind() == Declare::DeclareKind::TemplateClass)
+						continue;
+					const ClassDecl* classDeclPtr = static_cast<const ClassDecl*>(declPtr);
 					Mustache::Data<std::string> classNode(Mustache::Data<std::string>::Type::Object);
-					classNode["CLASS_NAME"] = classDecl.fullName;
+					classNode["CLASS_NAME"] = classDeclPtr->GetName();
 
 					Mustache::Data<std::string> fieldListNode(Mustache::Data<std::string>::Type::List);
-					for(auto& fieldName : classDecl.fieldNameVec)
+					for(const auto* fieldDeclPtr : classDeclPtr->GetFieldDeclVec())
 					{
 						Mustache::Data<std::string> fieldNode(Mustache::Data<std::string>::Type::Object);
-						fieldNode["CLASS_FIELD_NAME"] = fieldName;
+						fieldNode["CLASS_FIELD_TYPE_NAME"]	= fieldDeclPtr->GetTypeName();
+						fieldNode["CLASS_FIELD_NAME"]		= fieldDeclPtr->GetName();
+						fieldNode["CLASS_FIELD_OFFSET"]		= std::to_string(fieldDeclPtr->GetOffset());
+						std::cout << fieldDeclPtr->GetOffset() << "ssssss" << std::to_string(fieldDeclPtr->GetOffset());
 						fieldListNode << std::move(fieldNode);
 					}
 					classNode["CLASS_FIELD_LIST"] = std::move(fieldListNode);
 
 					Mustache::Data<std::string> methodListNode(Mustache::Data<std::string>::Type::List);
-					for(auto& methodName : classDecl.methodNameVec)
+					for(const auto* methodDeclPtr : classDeclPtr->GetMethodDeclVec())
 					{
 						Mustache::Data<std::string> methodNode(Mustache::Data<std::string>::Type::Object);
-						methodNode["CLASS_METHOD_NAME"] = methodName;
+						methodNode["CLASS_METHOD_NAME"] = methodDeclPtr->GetName();
 						methodListNode << std::move(methodNode);
 					}
 					classNode["CLASS_METHOD_LIST"] = std::move(methodListNode);
@@ -221,6 +190,5 @@ namespace vanir
 				output.close();
 			}
 		}
-
 	};//namespace tool
 };//namespace vanir

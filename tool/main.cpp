@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 		options.add_options()
 			("help", "Display help information")
 			("module,m", po::value<std::string>()->required(), "Module name")
-			("input,i", po::value<std::vector<std::string>>()->required(), "Input file list")
+			("input,i", po::value<std::vector<std::string>>()->multitoken(), "Input file list")
 			("output,o", po::value<std::string>()->required(), "Output file")
 			("template,t", po::value<std::string>()->default_value("../mustache/vanir_runtime_template.txt"), "Output file")
 			("compile_option", po::value<std::string>(), "Compile options")
@@ -45,7 +45,9 @@ int main(int argc, char** argv)
 	opt.arguments.push_back("-x");
 	opt.arguments.push_back("c++");
 	opt.arguments.push_back("-std=c++11");
-	opt.arguments.push_back("-D_D_VANIR_PARSER_");
+	opt.arguments.push_back("-stdlib=libstdc++");
+	opt.arguments.push_back("-D_VANIR_PARSER_");
+	opt.arguments.push_back("-m32");
 
 	vanir::tool::Parser parser(opt);
 	parser.Init();
