@@ -55,7 +55,10 @@ namespace vanir
 		const unsigned int ClangCursor::GetFieldOffset(void) const
 		{
 			//clang_Type_getOffsetOf return offset as bit
-			return ::clang_Type_getOffsetOf(this->GetParentCursor().GetClangType().GetHandle(), this->GetDisplayName().c_str()) / 8;
+			return ::clang_Type_getOffsetOf(
+				this->GetParentCursor().GetClangType().GetHandle(),
+				this->GetDisplayName().c_str()
+				) / 8;
 		}
 		const ClangCursor ClangCursor::GetDeclareCursor(void) const
 		{
@@ -70,6 +73,18 @@ namespace vanir
 		const ClangType ClangCursor::GetTypedefUnderlyingType(void) const
 		{
 			return ClangType(::clang_getTypedefDeclUnderlyingType(mHandle));
+		}
+		const std::string ClangCursor::GetFunctionArgsStr(void) const
+		{
+			std::string ret;
+			const int argCount = ::clang_Cursor_getNumArguments(this->mHandle);
+			for(int i = 0; i < argCount; ++ i)
+			{
+				const ClangCursor cursor = ClangCursor(::clang_Cursor_getArgument(this->mHandle, i));
+				ret.append(", ");
+				ret.append(cursor.GetClangType().GetSpelling());
+			}
+			return ret;
 		}
 	};//namespace tool
 };//namespace vanir

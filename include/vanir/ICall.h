@@ -5,6 +5,21 @@
 
 namespace vanir
 {
+	namespace detail
+	{
+		template<unsigned... N>
+		struct indices
+		{ ; };//struct indices
+		template<unsigned N, unsigned... Is>
+		struct unpack : public unpack<N - 1, N - 1, Is...>
+		{ ; };//struct unpack<N, Is...>
+		template<unsigned... Is>
+		struct unpack<0, Is...>
+		{
+			using indices = indices<Is...>;
+		};//sturct unpack<0, Is...>
+	};//namespace detail
+
 	class ICall
 	{
 	public:
@@ -21,7 +36,7 @@ namespace vanir
 		 * @param object:	the pointer to the object which owns this method.
 		 * @param args:		the list of the pointers to the arguments passed into this method.
 		 */
-		virtual void Call(void* ret, void* object, std::initializer_list<void*> args)	const = 0;
+		virtual void Call(void* ret, void* object, std::initializer_list<void*> args = { })	const = 0;
 	};
 };//namespace vanir
 

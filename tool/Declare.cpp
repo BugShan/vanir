@@ -1,6 +1,7 @@
 #include "Declare.h"
 #include "ClangType.h"
 
+#include <iostream>
 namespace vanir
 {
 	namespace tool
@@ -115,6 +116,7 @@ namespace vanir
 			, mBaseTypeNameVec()
 			, mFieldDeclVec()
 			, mMethodDeclVec()
+			, mConstructorSignature("void")
 			, mbRuntimeMarked(false)
 		{ ; }
 		ClassDecl::~ClassDecl(void)
@@ -134,6 +136,11 @@ namespace vanir
 				{
 					std::string baseTypeName = child.GetClangType().GetSpelling();
 					this->mBaseTypeNameVec.push_back(std::move(baseTypeName));
+				}
+				else if(child.GetKind() == ::CXCursor_Constructor)
+				{
+					const std::string signature = child.GetFunctionArgsStr();
+					mConstructorSignature = std::move(signature);
 				}
 				else if(child.GetKind() == ::CXCursor_FieldDecl)
 				{
@@ -195,6 +202,10 @@ namespace vanir
 					return true;
 			}
 			return false;
+		}
+		const std::string& ClassDecl::GetConstructorSignature(void) const
+		{
+			return this->mConstructorSignature;
 		}
 
 		TemplateClassDecl::TemplateClassDecl(const std::string& fullName, const ClangCursor& cursor)

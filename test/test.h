@@ -1,13 +1,20 @@
 #ifndef	_TEST_H_
 #define	_TEST_H_
 
+#include <vanir/Object.h>
+using namespace vanir;
 namespace test
 {
-	class Test
+	class Test : public vanir::Object
 	{
 	public:
-		void foo(void);
-	private:
+		Test(const int& i) { this->i = i; this->j = 1; }
+		void foo(const int& i);
+		virtual Type* GetType(void) const override
+		{
+			return nullptr;
+		}
+	public:
 		int i;
 		int j;
 	};

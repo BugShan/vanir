@@ -33,6 +33,7 @@ namespace vanir
 			const ClangCursor GetDeclareCursor(void) const;
 			const ClangType	GetClangType(void) const;
 			const ClangType GetTypedefUnderlyingType(void) const;
+			const std::string GetFunctionArgsStr(void) const;
 
 		private:
 			CXCursor			mHandle;
