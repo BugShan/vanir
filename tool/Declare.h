@@ -83,11 +83,13 @@ namespace vanir
 			const std::vector<MethodDecl*>& GetMethodDeclVec(void) const;
 			const bool IsRuntimeMarked(void) const;
 			const bool IsHeritedFromObject(void) const;
+			const std::string& GetConstructorSignature(void) const;
 
 		protected:
 			std::vector<std::string>		mBaseTypeNameVec;
 			std::vector<FieldDecl*>			mFieldDeclVec;
 			std::vector<MethodDecl*>		mMethodDeclVec;
+			std::string						mConstructorSignature;
 			bool							mbRuntimeMarked;
 		};//class Decl
 

@@ -7,7 +7,9 @@
 namespace vanir
 {
 	class Field;
+	class ICall;
 	class Method;
+	class Object;
 	class Class : public Type
 	{
 		friend class Internal;
@@ -45,7 +47,10 @@ namespace vanir
 		 * @return: if not found return null pointer
 		 */
 		const Method* const GetMethodPtr(const std::string& methodName) const;
-
+		/**
+		 * Create a instance of this [Type].
+		 */
+		Object* CreateInstance(const std::initializer_list<void*> args = { }) const;
 	public:
 		/**
 		 * Set the name of one base type
@@ -61,6 +66,10 @@ namespace vanir
 		 * @param methodPtr: the pointer of the method
 		 */
 		inline void DefineMethod(const Method* const methodPtr);
+		/**
+		 * Add a constructor.
+		 */
+		inline void DefineConstructor(const ICall* const constructor);
 
 	protected:
 		Class(const std::string& fullName, const unsigned int size);
@@ -70,6 +79,7 @@ namespace vanir
 		std::vector<std::string>			mBaseTypeNameVec;
 		std::vector<const Method*>			mMethodPtrVec;
 		std::vector<const Field*>			mFieldPtrVec;
+		ICall*								mpConstructor;
 	};//class Class
 
 	inline const std::vector<std::string>& Class::GetAllBaseTypeNameVec(void) const
@@ -90,6 +100,10 @@ namespace vanir
 	inline void Class::DefineMethod(const Method* const methodPtr)
 	{
 		this->mMethodPtrVec.push_back(methodPtr);
+	}
+	inline void Class::DefineConstructor(const ICall* const constructor)
+	{
+		mpConstructor = const_cast<ICall*>(constructor);
 	}
 };//namespace vanir
 #endif//_VANIR_CLASS_H_

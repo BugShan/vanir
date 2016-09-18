@@ -1,8 +1,6 @@
 #include <vanir/Class.h>
 #include <vanir/Field.h>
 #include <vanir/Method.h>
-
-
 namespace vanir
 {
 	Class::Class(const std::string& fullName, const unsigned int size)
@@ -48,6 +46,12 @@ namespace vanir
 			if(type)
 				ret.push_back(static_cast<const Class*>(type));
 		}
+		return ret;
+	}
+	Object* Class::CreateInstance(const std::initializer_list<void*> args) const
+	{
+		Object* ret = nullptr;
+		mpConstructor->Call(&ret, nullptr, args);
 		return ret;
 	}
 };//namespace vanir

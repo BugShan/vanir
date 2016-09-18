@@ -10,21 +10,6 @@
 
 namespace vanir
 {
-	namespace detail
-	{
-		template<unsigned... N>
-		struct indices
-		{ ; };//struct indices
-		template<unsigned N, unsigned... Is>
-		struct unpack : public unpack<N - 1, N - 1, Is...>
-		{ ; };//struct unpack<N, Is...>
-		template<unsigned... Is>
-		struct unpack<0, Is...>
-		{
-			using indices = indices<Is...>;
-		};//sturct unpack<0, Is...>
-	};//namespace detail
-
 	class Method final
 	{
 	public:
@@ -40,14 +25,15 @@ namespace vanir
 		 *	Method method("foo", &Test::foo);
 		 * ```
 		 */
-		template<typename T, typename = typename std::enable_if<std::is_member_pointer<T>::value, void>::type>
-		inline Method(const std::string& name, T methodPtr);
+		template<typename Class, typename Return, typename... Args>
+		inline Method(const std::string& name, Return(Class::*methodPtr)(Args...));
+		template<typename Class, typename Return, typename... Args>
+		inline Method(const std::string& name, Return(Class::*methodPtr)(Args...)const);
 		
 		/**
 		 * The destructor.
 		 */
 		inline ~Method(void);
-
 	public:
 		/**
 		 * Get the name of this method.
@@ -66,7 +52,7 @@ namespace vanir
 		 * @param object:	the pointer to the object which owns this method.
 		 * @param args:		the list of the pointers to the arguments passed into this method.
 		 */
-		inline void Call(void* ret, void* object, std::initializer_list<void*> args = { });
+		inline void Call(void* ret, void* object, std::initializer_list<void*> args = { }) const;
 
 	private:
 		const std::string				mName;
@@ -76,13 +62,9 @@ namespace vanir
 		unsigned char					mBuffer[32];
 	};//class Method
 
-	template<typename T>
-	class MethodCall;
-
-	template<typename Class, typename Return, typename... Args>
-	class MethodCall<Return(Class::*)(Args...)> final : public ICall
+	template<typename FunPtr, typename Class, typename Return, typename... Args>
+	class MethodCall final : public ICall
 	{
-		using FunPtr = Return(Class::*)(Args... args);
 	public:
 		/**
 		 * The constructor & the destructor.
@@ -115,13 +97,23 @@ namespace vanir
 	};//class MethodCall
 
 	/*===================================class Method===============================*/
-	template<typename T, typename/* = typename std::enable_if<std::is_member_pointer<T>::value, void>::type*/>
-	inline Method::Method(const std::string& name, T methodPtr)
+	template<typename Class, typename Return, typename... Args>
+	inline Method::Method(const std::string& name, Return(Class::*methodPtr)(Args...))
 		: mName(name)
 		, mpCall((ICall*)mBuffer)
 	{
-		static_assert(sizeof(mBuffer) >= sizeof(MethodCall<T>), "The size of the buffer is not enough.");
-		new(mBuffer)MethodCall<T>(methodPtr);
+		using MethodCallTy = MethodCall<Return(Class::*)(Args...), Class, Return, Args...>;
+		static_assert(sizeof(mBuffer) >= sizeof(MethodCallTy), "The size of the buffer is not enough.");
+		new(mBuffer)MethodCallTy(methodPtr);
+	}
+	template<typename Class, typename Return, typename... Args>
+	inline Method::Method(const std::string& name, Return(Class::*methodPtr)(Args...)const)
+		: mName(name)
+		, mpCall((ICall*)mBuffer)
+	{
+		using MethodCallTy = MethodCall<Return(Class::*)(Args...)const, Class, Return, Args...>;
+		static_assert(sizeof(mBuffer) >= sizeof(MethodCallTy), "The size of the buffer is not enough.");
+		new(mBuffer)MethodCallTy(methodPtr);
 	}
 
 	inline Method::~Method(void)
@@ -134,46 +126,47 @@ namespace vanir
 	inline const unsigned int Method::GetParameterCount(void) const
 	{ return this->mpCall->GetParameterCount(); }
 
-	inline void Method::Call(void* ret, void* object, std::initializer_list<void*> args/* = { }*/)
+	inline void Method::Call(void* ret, void* object, std::initializer_list<void*> args/* = { }*/) const
 	{
 		this->mpCall->Call(ret, object, args);
 	}
 
 	/*===================================class MethodCall===============================*/
-	template<typename Class, typename Return, typename... Args>
-	inline MethodCall<Return(Class::*)(Args...)>::MethodCall(MethodCall<Return(Class::*)(Args...)>::FunPtr methodPtr)
+	template<typename FunPtr, typename Class, typename Return, typename... Args>
+	inline MethodCall<FunPtr, Class, Return, Args...>::MethodCall(const FunPtr methodPtr)
 		: mpFun(methodPtr)
 	{ ; }
-	template<typename Class, typename Return, typename... Args>
-	inline MethodCall<Return(Class::*)(Args...)>::~MethodCall(void)
+	template<typename FunPtr, typename Class, typename Return, typename... Args>
+	inline MethodCall<FunPtr, Class, Return, Args...>::~MethodCall(void)
 	{ ; }
 
-	template<typename Class, typename Return, typename... Args>
-	const unsigned int MethodCall<Return(Class::*)(Args...)>::GetParameterCount(void) const
+	template<typename FunPtr, typename Class, typename Return, typename... Args>
+	const unsigned int MethodCall<FunPtr, Class, Return, Args...>::GetParameterCount(void) const
 	{ return sizeof...(Args); }
 
-	template<typename Class, typename Return, typename... Args>
-	void MethodCall<Return(Class::*)(Args...)>::Call(void* ret, void* object, std::initializer_list<void*> args) const
+	template<typename FunPtr, typename Class, typename Return, typename... Args>
+	void MethodCall<FunPtr, Class, Return, Args...>::Call(void* ret, void* object, std::initializer_list<void*> args) const
 	{
-		//assert(args.size() == sizeof...(Args), "MethodCall: argument count not matched.");
-		assert(args.size() == sizeof...(Args));
+		assert(args.size() == sizeof...(Args) && "MethodCall: argument count not matched.");
 		this->DoCall(ret, object, const_cast<void**>(args.begin()), typename detail::unpack<sizeof...(Args)>::indices());
 	}
 
-	template<typename Class, typename Return, typename... Args>
+	template<typename FunPtr, typename Class, typename Return, typename... Args>
 	template<typename T, unsigned... Is>
-	inline auto MethodCall<Return(Class::*)(Args...)>::DoCall(void* ret, void* object, void** args, detail::indices<Is...>) const
+	inline auto MethodCall<FunPtr, Class, Return, Args...>::DoCall(void* ret, void* object, void** args, detail::indices<Is...>) const
 		-> typename std::enable_if<!std::is_void<T>::value>::type
 	{
-		Return res = ((static_cast<Class*>(object))->*mpFun)(*(Args*)args[Is]...);
+		Return res = ((static_cast<Class*>(object))->*mpFun)(
+			static_cast<Args>(*(typename std::remove_reference<Args>::type*)args[Is])...);
 		memcpy(ret, &res, sizeof(res));
 	}
-	template<typename Class, typename Return, typename... Args>
+	template<typename FunPtr, typename Class, typename Return, typename... Args>
 	template<typename T, unsigned... Is>
-	inline auto MethodCall<Return(Class::*)(Args...)>::DoCall(void* ret, void* object, void** args, detail::indices<Is...>) const
+	inline auto MethodCall<FunPtr, Class, Return, Args...>::DoCall(void* ret, void* object, void** args, detail::indices<Is...>) const
 		-> typename std::enable_if<std::is_void<T>::value>::type
 	{
-		((static_cast<Class*>(object))->*mpFun)(*(Args*)args[Is]...);
+		((static_cast<Class*>(object))->*mpFun)(
+			static_cast<Args>(*(typename std::remove_reference<Args>::type*)args[Is])...);
 	}
 };//namespace vanir
 #endif//_VANIR_METHOD_H_

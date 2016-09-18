@@ -159,6 +159,7 @@ namespace vanir
 					const ClassDecl* classDeclPtr = static_cast<const ClassDecl*>(declPtr);
 					Mustache::Data<std::string> classNode(Mustache::Data<std::string>::Type::Object);
 					classNode["CLASS_NAME"] = classDeclPtr->GetName();
+					classNode["CLASS_CONSTRUCTOR_SIGN"] = classDeclPtr->GetConstructorSignature();
 
 					Mustache::Data<std::string> fieldListNode(Mustache::Data<std::string>::Type::List);
 					for(const auto* fieldDeclPtr : classDeclPtr->GetFieldDeclVec())
@@ -167,7 +168,6 @@ namespace vanir
 						fieldNode["CLASS_FIELD_TYPE_NAME"]	= fieldDeclPtr->GetTypeName();
 						fieldNode["CLASS_FIELD_NAME"]		= fieldDeclPtr->GetName();
 						fieldNode["CLASS_FIELD_OFFSET"]		= std::to_string(fieldDeclPtr->GetOffset());
-						std::cout << fieldDeclPtr->GetOffset() << "ssssss" << std::to_string(fieldDeclPtr->GetOffset());
 						fieldListNode << std::move(fieldNode);
 					}
 					classNode["CLASS_FIELD_LIST"] = std::move(fieldListNode);
