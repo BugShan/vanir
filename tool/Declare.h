@@ -81,9 +81,11 @@ namespace vanir
 			const std::vector<std::string>	GetBaseTypeNameVec(void) const;
 			const std::vector<FieldDecl*>& GetFieldDeclVec(void) const;
 			const std::vector<MethodDecl*>& GetMethodDeclVec(void) const;
+			const std::string& GetConstructorSignature(void) const;
+			void SetRuntimeMarked(const bool val);
 			const bool IsRuntimeMarked(void) const;
 			const bool IsHeritedFromObject(void) const;
-			const std::string& GetConstructorSignature(void) const;
+			const bool ShouldBeRegistered(void) const;
 
 		protected:
 			std::vector<std::string>		mBaseTypeNameVec;

@@ -23,5 +23,5 @@ vanir_parse(TARGET test_exe
 			OUTPUT_PATH "${CMAKE_BINARY_DIR}/Generator/output.cpp"
 			TEMPLATE "${VANIR_ROOT_DIR}/mustache/VanirModuleTemplate.mustache"
 			INCLUDE_DIR_LIST ${VANIR_INCLUDE_DEPS}
-			OPTION""
+			OPTION"display_message"
 			)

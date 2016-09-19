@@ -2,13 +2,21 @@
 #define	_TEST_H_
 
 #include <vanir/Object.h>
+#include "../include/vanir/Object.h"
+#include <vector>
+#include <stdlib.h>
+#include <map>
+#include <set>
 using namespace vanir;
+struct sss
+{};
 namespace test
 {
+	class Base{};
 	class Test : public vanir::Object
 	{
 	public:
-		Test(const int& i) { this->i = i; this->j = 1; }
+		Test(void) {}
 		void foo(const int& i);
 		virtual Type* GetType(void) const override
 		{
@@ -17,6 +25,7 @@ namespace test
 	public:
 		int i;
 		int j;
+		std::vector<int> ivec;
 	};
 };
 #endif//_TEST_H_

@@ -144,6 +144,12 @@ namespace vanir
 				Mustache::Data<std::string> typeInfoListNode(Mustache::Data<std::string>::Type::List);
 				for(const auto* declPtr : Declare::GetAllDeclareVec())
 				{
+					if(declPtr->GetKind() == Declare::DeclareKind::Class || declPtr->GetKind() == Declare::DeclareKind::TemplateClass)
+					{
+						const ClassDecl* classDeclPtr = static_cast<const ClassDecl*>(declPtr);
+						if(!classDeclPtr->ShouldBeRegistered())
+							continue;
+					}
 					Mustache::Data<std::string> typeInfoNode(Mustache::Data<std::string>::Type::Object);
 					typeInfoNode["TYPE_NAME"] = declPtr->GetName();
 					typeInfoListNode << std::move(typeInfoNode);
@@ -154,9 +160,11 @@ namespace vanir
 				Mustache::Data<std::string> classListNode(Mustache::Data<std::string>::Type::List);
 				for(const auto* declPtr : Declare::GetAllDeclareVec())
 				{
-					if(declPtr->GetKind() != Declare::DeclareKind::Class || declPtr->GetKind() == Declare::DeclareKind::TemplateClass)
+					if(!(declPtr->GetKind() == Declare::DeclareKind::Class || declPtr->GetKind() == Declare::DeclareKind::TemplateClass))
 						continue;
 					const ClassDecl* classDeclPtr = static_cast<const ClassDecl*>(declPtr);
+					if(!classDeclPtr->ShouldBeRegistered())
+						continue;
 					Mustache::Data<std::string> classNode(Mustache::Data<std::string>::Type::Object);
 					classNode["CLASS_NAME"] = classDeclPtr->GetName();
 					classNode["CLASS_CONSTRUCTOR_SIGN"] = classDeclPtr->GetConstructorSignature();
