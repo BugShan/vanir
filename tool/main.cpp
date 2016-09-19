@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 	opt.arguments.push_back("-x");
 	opt.arguments.push_back("c++");
 	opt.arguments.push_back("-std=c++11");
-	opt.arguments.push_back("-stdlib=libstdc++");
+	//opt.arguments.push_back("-stdlib=libstdc++");
 	opt.arguments.push_back("-D_VANIR_PARSER_");
 	opt.arguments.push_back("-m32");
 

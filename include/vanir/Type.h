@@ -1,7 +1,7 @@
 #ifndef	_VANIR_TYPE_H_
 #define	_VANIR_TYPE_H_
 
-#include <vanir/Vanir.h>
+#include <vanir/Common.h>
 #include <string>
 
 namespace vanir

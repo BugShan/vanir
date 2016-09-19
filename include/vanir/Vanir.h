@@ -7,12 +7,6 @@
 #include <string>
 #include <vector>
 
-#if defined(_VANIR_PARSER_)
-	#define RUNTIME __attribute__((annotate("VanirRuntime")))
-#else
-	#define RUNTIME
-#endif//defined(_VANIR_PARSER_)
-
 namespace vanir
 {
 	class Type;

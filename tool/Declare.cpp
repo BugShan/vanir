@@ -1,7 +1,6 @@
 #include "Declare.h"
 #include "ClangType.h"
 
-#include <iostream>
 namespace vanir
 {
 	namespace tool
@@ -116,7 +115,7 @@ namespace vanir
 			, mBaseTypeNameVec()
 			, mFieldDeclVec()
 			, mMethodDeclVec()
-			, mConstructorSignature("void")
+			, mConstructorSignature()
 			, mbRuntimeMarked(false)
 		{ ; }
 		ClassDecl::~ClassDecl(void)
@@ -134,7 +133,7 @@ namespace vanir
 			{
 				if(child.GetKind() == ::CXCursor_CXXBaseSpecifier)
 				{
-					std::string baseTypeName = child.GetClangType().GetSpelling();
+					const std::string baseTypeName = child.GetClangType().GetSpelling();
 					this->mBaseTypeNameVec.push_back(std::move(baseTypeName));
 				}
 				else if(child.GetKind() == ::CXCursor_Constructor)
@@ -152,7 +151,11 @@ namespace vanir
 					if(!Declare::ContainDecl(fullTypeName) && !templateName.empty())
 					{
 						TemplateClassDecl* templateDeclPtr = new TemplateClassDecl(fullTypeName, declPtr->GetClangCursor().GetDeclareCursor());
-						Declare::AddDeclare(*templateDeclPtr);
+						if(templateDeclPtr->Init())
+						{
+							templateDeclPtr->SetRuntimeMarked(true);
+							Declare::AddDeclare(*templateDeclPtr);
+						}
 					}
 				}
 				else if(child.GetKind() == ::CXCursor_CXXMethod)
@@ -188,6 +191,14 @@ namespace vanir
 		{ return this->mFieldDeclVec; }
 		const std::vector<MethodDecl*>& ClassDecl::GetMethodDeclVec(void) const
 		{ return this->mMethodDeclVec; }
+		const std::string& ClassDecl::GetConstructorSignature(void) const
+		{
+			return this->mConstructorSignature;
+		}
+		void ClassDecl::SetRuntimeMarked(const bool val)
+		{
+			this->mbRuntimeMarked = val;
+		}
 		const bool ClassDecl::IsRuntimeMarked(void) const
 		{
 			return this->mbRuntimeMarked;
@@ -203,9 +214,9 @@ namespace vanir
 			}
 			return false;
 		}
-		const std::string& ClassDecl::GetConstructorSignature(void) const
+		const bool ClassDecl::ShouldBeRegistered(void) const
 		{
-			return this->mConstructorSignature;
+			return this->IsHeritedFromObject() || this->IsRuntimeMarked();
 		}
 
 		TemplateClassDecl::TemplateClassDecl(const std::string& fullName, const ClangCursor& cursor)

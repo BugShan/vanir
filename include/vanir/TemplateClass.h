@@ -11,6 +11,8 @@ namespace vanir
 		inline const std::string& GetTemplateName(void) const;
 		inline const std::vector<std::string>& GetTemplateArgumentNameVec(void) const;
 
+	public:
+		void DefineTemplateArgument(const std::string& argName);
 		const std::vector<const Type*> GetTemplateArgumentTypePtrVec(void) const;
 
 	private:
